@@ -5,33 +5,34 @@ from . forms import TaskForm
 # Create your views here.
 
 def home(request, pk = None):
-
-    if request.method == 'GET':
-        if pk != None:
-            task = Task.objects.get(id = pk)
+    if pk != None:
+        task = Task.objects.get(id = pk)
+        if request.POST.get('delete') == 'delete':
             task.delete()
 
-        form = TaskForm
-        task_list = list(Task.objects.all().values())
-        page = {
-            'form': form,
-            'task_list': task_list
-        }
+        elif request.POST.get('edit') == 'edit':
+            form = TaskForm(instance = task)
 
-        return render(request, 'app1/home.html', page)
+            return render(request, 'app1/update.html', {'form': form, 'task': task})  
 
-    elif request.method == 'POST':
+        elif request.POST.get('update') == 'update':
+            form = TaskForm(request.POST, instance = task)
+            if form.is_valid():
+                form.save()          
+
+    else:  
         form = TaskForm(request.POST)
         if form.is_valid():
-            Task.objects.create(**form.cleaned_data)
-        
-        return redirect('home')
+            form.save()
 
-    elif request.method == 'PUT':
-        pass
+    form = TaskForm
+    task_list = list(Task.objects.all().values())
+    page = {
+        'form': form,
+        'task_list': task_list
+    }
 
-    elif request.method == 'DELETE':
-        pass
+    return render(request, 'app1/home.html', page)
     
 def list_view(request):
     task_list = list(Task.objects.all().values())

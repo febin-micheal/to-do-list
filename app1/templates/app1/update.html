@@ -1,0 +1,8 @@
+<title>Edit Task</title>
+<h1>Update Task</h1>
+
+<form action="/{{task.id}} " method="post">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit" name="update" value="update">Update</button>
+</form>
